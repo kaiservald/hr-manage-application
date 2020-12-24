@@ -1,0 +1,38 @@
+
+/*
+#FDE8C5
+#C9A161
+*/
+.bg-primary {
+    background-color: #C9A161 !important;
+}
+
+.btn-success {
+    color: #fff;
+    background-color: #C9A161;
+    border-color: #a0804d;
+}
+
+.btn-success:hover {
+    color: #fff;
+    background-color: #b49057;
+    border-color: #8c7043;
+}
+
+.btn-success:active {
+    color: #fff;
+    background-color: #b49057;
+    border-color: #8c7043;
+}
+
+.btn-danger {
+    color: #fff;
+    background-color: #d9534f;
+    border-color: #dc3545;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #5bc09e;
+    border-color: #007bff;
+}
