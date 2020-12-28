@@ -47,7 +47,9 @@ AppAsset::register($this);
         $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
     } else {
         if (Yii::$app->user->can('authUser')) {
+
             $dropDownItems[] = ['label' => "Мої запити", 'url' => '/request/my'];
+            $dropDownItems[] = ['label' => "Мій профіль", 'url' => '/profile'];
             $dropDownItems[] = "<div class='dropdown-divider'></div>";
         }
         if (Yii::$app->user->can('manager')) {
