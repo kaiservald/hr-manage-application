@@ -8,7 +8,9 @@ use frontend\models\FileSystem;
 use Yii;
 use frontend\models\User;
 use frontend\models\UserSearch;
+use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
@@ -29,6 +31,18 @@ class UserController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['index', 'view', 'my', 'update', 'update-image'],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view', 'my', 'update', 'update-image'],
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+
         ];
     }
 
@@ -97,19 +111,24 @@ class UserController extends Controller
      */
     public function actionUpdateImage($id)
     {
+        if (!Yii::$app->user->can('updateUser', ['user' => $id])) {
+            throw new ForbiddenHttpException("Not enough permissions");
+        }
         $model = new UpdateImageForm();
-        if ($model->load(Yii::$app->request->post()) && $model->updateImage())  {
+        if (Yii::$app->request->isPost && $model->updateImage($id))  {
             Yii::$app->session->setFlash('success', 'Success! Your image has successfully updated!');
             return $this->redirect(['view', 'id' => $id]);
         }
-        return $this->render('update', [
+        return $this->render('update-image', [
             'model' => $model,
         ]);
     }
 
     public function actionUpdate($id)
     {
-
+        if (!Yii::$app->user->can('updateUser', ['user' => $id])) {
+            throw new ForbiddenHttpException("Not enough permissions");
+        }
         $model = new UpdateForm();
         $model->id = $id;
         if (Yii::$app->request->isPost) {

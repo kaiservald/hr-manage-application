@@ -15,13 +15,32 @@ $this->params['breadcrumbs'][] = ['label' => 'Мої запити на робо�
 <section id="continent-view">
     <div class="container">
 
+        <?php
 
+        $buttons['view'] = function ($url, $model) {
+            if (Yii::$app->user->can("viewRequest", ["request" => $model])) {
+                return Html::a(FAS::icon('eye'), Url::to(['request/view', 'id' => $model->request_id]), [
+                    'title' => "View",
+                    "style" => "margin: 3px"
+                ]);
+            }
+        };
+
+        $buttons['delete'] = function ($url, $model) {
+            if (Yii::$app->user->can("deleteRequest")) {
+                return Html::a(FAS::icon('trash'), $url, [
+                    'title' => "Delete",
+                    "style" => "margin: 3px",
+                    'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                    'data-method' => 'post',
+                ]);
+            }
+        };
+
+        ?>
         <?= GridView::widget([
             'dataProvider' => $dataProvider,
-            'filterModel' => $searchModel,
             'columns' => [
-                ['class' => 'yii\grid\SerialColumn'],
-
                 [
                     'attribute' => 'vacancy',
                     'format' => 'raw',
@@ -29,11 +48,13 @@ $this->params['breadcrumbs'][] = ['label' => 'Мої запити на робо�
                         return Html::a(Html::encode($model->vacancy->title),['vacancy/view', 'id' => $model->vacancy->vacancy_id]);
                     },
                 ],
-                'first_name',
-                'last_name',
-                'username',
                 'created_at',
-
+                'resume',
+                ['class' => 'yii\grid\ActionColumn',
+                    'header' => 'Actions',
+                    'template' => '{view}{delete}',
+                    'buttons' => $buttons,
+                ],
 
             ],
         ]); ?>

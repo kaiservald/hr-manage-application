@@ -51,8 +51,10 @@ class Vacancy extends \yii\db\ActiveRecord
     {
         return [
             'vacancy_id' => 'Vacancy ID',
-            'title' => 'Title',
-            'description' => 'Description',
+            'title' => 'Заголовок',
+            'description' => 'Опис',
+            'username' => "Ким створено",
+            'created_at' => "Час створення",
         ];
     }
 

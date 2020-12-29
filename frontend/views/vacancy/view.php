@@ -1,7 +1,9 @@
 <?php
 
+use rmrevin\yii\fontawesome\FAS;
 use yii\grid\GridView;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\DetailView;
 use yii\widgets\ListView;
 
@@ -9,7 +11,7 @@ use yii\widgets\ListView;
 /* @var $model frontend\models\Vacancy */
 
 $this->title = $model->title;
-$this->params['breadcrumbs'][] = ['label' => 'Vacancies', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Вакансії', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -56,20 +58,40 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="row">
             <div class="col">
                 <h2>Запити на роботу</h2>
+                <?php
+
+                $buttons['view'] = function ($url, $model) {
+                    if (Yii::$app->user->can("viewRequest", ["request" => $model])) {
+                        return Html::a(FAS::icon('eye'), Url::to(['request/view', 'id' => $model->request_id]), [
+                            'title' => "View",
+                            "style" => "margin: 3px"
+                        ]);
+                    }
+                };
+                $buttons['delete'] = function ($url, $model) {
+                    if (Yii::$app->user->can("deleteRequest")) {
+                        return Html::a(FAS::icon('trash'), Url::to(['request/delete', 'id' => $model->request_id]), [
+                            'title' => "Delete",
+                            "style" => "margin: 3px",
+                            'data-confirm' => Yii::t('yii', 'Are you sure you want to delete this item?'),
+                            'data-method' => 'post',
+                        ]);
+                    }
+                };
+
+                ?>
                 <?= GridView::widget([
                     'dataProvider' => $requestProvider,
                     'columns' => [
-                        [
-                            'attribute' => 'vacancy',
-                            'format' => 'raw',
-                            'value' => function ($model) {
-                                return Html::a(Html::encode($model->vacancy->title),['vacancy/view', 'id' => $model->vacancy->vacancy_id]);
-                            },
-                        ],
                         'first_name',
                         'last_name',
                         'username',
                         'created_at',
+                        ['class' => 'yii\grid\ActionColumn',
+                            'header' => 'Actions',
+                            'template' => '{view} {delete}',
+                            'buttons' => $buttons,
+                        ],
                     ],
                 ]) ?>
             </div>

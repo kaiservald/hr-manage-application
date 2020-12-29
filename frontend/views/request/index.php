@@ -29,6 +29,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'request_id',
             'first_name',
             'last_name',
+            'email',
             'vacancy_id',
             'created_by',
             //'created_at',

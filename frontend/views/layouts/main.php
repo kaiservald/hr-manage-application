@@ -39,30 +39,31 @@ AppAsset::register($this);
         ],
     ]);
     $menuItems = [
-        ['label' => 'Home', 'url' => ['/site/index']],
-        ['label' => 'All vacancies', 'url' => ['/vacancy/index']],
+        ['label' => 'Головна', 'url' => ['/site/index']],
+        ['label' => 'Вакансії', 'url' => ['/vacancy/index']],
+        ['label' => 'Користувачі', 'url' => ['/user/index']],
     ];
     if (Yii::$app->user->isGuest) {
-        $menuItems[] = ['label' => 'Signup', 'url' => ['/site/signup']];
-        $menuItems[] = ['label' => 'Login', 'url' => ['/site/login']];
+        $menuItems[] = ['label' => 'Реєстрація', 'url' => ['/site/signup']];
+        $menuItems[] = ['label' => 'Вхід', 'url' => ['/site/login']];
     } else {
         if (Yii::$app->user->can('authUser')) {
 
-            $dropDownItems[] = ['label' => "Мої запити", 'url' => '/request/my'];
-            $dropDownItems[] = ['label' => "Мій профіль", 'url' => '/profile'];
+            $dropDownItems[] = ['label' => "Мої запити (користувач)", 'url' => '/request/my'];
+            $dropDownItems[] = ['label' => "Мій профіль (користувач)", 'url' => '/profile'];
             $dropDownItems[] = "<div class='dropdown-divider'></div>";
         }
         if (Yii::$app->user->can('manager')) {
-            $dropDownItems[] = ['label' => "Manage my vacancies", 'url' => '/vacancy/my'];
-            $dropDownItems[] = ['label' => "New vacancy", 'url' => '/vacancy/create'];
+            $dropDownItems[] = ['label' => "Мої вакансії (менеджер)", 'url' => '/vacancy/my'];
+            $dropDownItems[] = ['label' => "Нова вакансія (менеджер)", 'url' => '/vacancy/create'];
             $dropDownItems[] = "<div class='dropdown-divider'></div>";
         }
         if (Yii::$app->user->can('admin')) {
-            $dropDownItems[] = ['label' => "Manage all vacancies", 'url' => '/vacancy/admin'];
+            $dropDownItems[] = ['label' => "Всі вакансії (адмін)", 'url' => '/vacancy/admin'];
             $dropDownItems[] = "<div class='dropdown-divider'></div>";
         }
         $dropDownItems[] = [
-            'label' => 'Logout (' . Yii::$app->user->identity->username . ')',
+            'label' => 'Вихід (' . Yii::$app->user->identity->username . ')',
             'url' => ['site/logout'],
             'linkOptions' => ['data-method' => 'post']
         ];

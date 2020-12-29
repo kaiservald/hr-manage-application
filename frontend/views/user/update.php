@@ -15,21 +15,29 @@ $this->params['breadcrumbs'][] = 'Update';
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <div class="user-form">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-8 col-sm-4">
+                <div class="user-form">
 
-        <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]) ?>
+                    <?php $form = ActiveForm::begin() ?>
 
-        <?=  $form->field($model, 'id')->hiddenInput(['value'=> $model->id])->label(false); ?>
-        <?= $form->field($model, 'username')->textInput() ?>
-        <?= $form->field($model, 'first_name')->textInput() ?>
-        <?= $form->field($model, 'last_name')->textInput() ?>
+                    <?=  $form->field($model, 'id')->hiddenInput(['value'=> $model->id])->label(false); ?>
+                    <?= $form->field($model, 'username')->textInput() ?>
+                    <?= $form->field($model, 'first_name')->textInput() ?>
+                    <?= $form->field($model, 'last_name')->textInput() ?>
 
-        <div class="form-group">
-            <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+                    <div class="form-group">
+                        <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>
+                    </div>
+
+                    <?php ActiveForm::end(); ?>
+
+                </div>
+            </div>
         </div>
-
-        <?php ActiveForm::end(); ?>
-
     </div>
+
+
 
 </div>

@@ -107,7 +107,7 @@ class VacancyController extends Controller
     public function actionCreate()
     {
         if (!Yii::$app->user->can('createVacation')) {
-            throw new ForbiddenHttpException("User can't create new task");
+            throw new ForbiddenHttpException("Ви не маєте права створювати нову вакансію");
         }
         $model = new Vacancy();
 

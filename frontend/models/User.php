@@ -16,4 +16,25 @@ class User extends \common\models\User
         }
         return '/images/user/' . $this->image;
     }
+
+    public function getRole()
+    {
+        $roles = array_keys(Yii::$app->authManager->getRolesByUser($this->id));
+        return join(", ", $roles);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'first_name' => 'Ім\'я',
+            'last_name' => 'Прізвище',
+            'email' => 'Email',
+            'role' => "Роль",
+            'image' => "Зображення",
+            'username' => "Логін",
+        ];
+    }
 }

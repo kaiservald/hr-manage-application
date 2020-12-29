@@ -7,26 +7,28 @@ use yii\widgets\DetailView;
 /* @var $model frontend\models\User */
 
 $this->title = "Профіль користувача " . $model->username;
-$this->params['breadcrumbs'][] = ['label' => 'Users', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Користувачі', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="user-view">
 
-    <h1><?= Html::encode($this->title) ?></h1>
+    <h1 class="text-center"><?= Html::encode($this->title) ?></h1>
 
-    <p>
-        <?= Html::a('Update', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
 
-    </p>
 
     <div class="container">
-        <div class="row">
-            <div class="col-12 col-sm-3">
-                <?= Html::img($model->getImage(), ['alt' => 'My logo', 'width' => '100%']) ?>
+
+        <div class="row justify-content-center">
+            <div class="col-7 col-sm-3">
+                <?= Html::img($model->getImage(), ['alt' => 'My logo', 'width' => '100%', 'class' => 'border']) ?>
+                <?php if (Yii::$app->user->can('updateUser', ['user' => $model->getId()])): ?>
+                <?= Html::a('Редагувати зображення', ['update-image', 'id' => $model->id], ['class' => 'btn btn-primary mt-2']) ?>
+                <?php endif; ?>
             </div>
 
-            <div class="col-12 col-sm-3">
+
+            <div class="col-7 col-sm-4">
                 <?= DetailView::widget([
                     'model' => $model,
                     'attributes' => [
@@ -34,11 +36,21 @@ $this->params['breadcrumbs'][] = $this->title;
                         'first_name',
                         'last_name',
                         'email:email',
+                        [
+                            'attribute' => 'role',
+                            'value' => function ($data) {
+                                return $data->getRole();
+                            },
+                        ],
 
                     ],
                 ]) ?>
+                <?php if (Yii::$app->user->can('updateUser', ['user' => $model->getId()])): ?>
+                <?= Html::a('Редагувати профіль', ['update', 'id' => $model->id], ['class' => 'btn btn-primary mt-2']) ?>
+                <?php endif; ?>
             </div>
         </div>
+
     </div>
 
 

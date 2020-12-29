@@ -28,11 +28,11 @@ class UpdateImageForm extends Model
 
     public function updateImage($id)
     {
+        $this->imageFile = UploadedFile::getInstance($this, 'imageFile');
         if (!$this->validate()) {
             return null;
         }
         $user = User::findOne($id);
-        $this->imageFile = UploadedFile::getInstance($this, 'imageFile');
         $this->setNewImageName();
         if ($this->upload()) {
             $this->oldImageName = $user->image;

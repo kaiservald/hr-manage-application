@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 use Yii;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "request".
@@ -21,6 +22,8 @@ use Yii;
  */
 class Request extends \yii\db\ActiveRecord
 {
+    public $resumeFile;
+
     /**
      * {@inheritdoc}
      */
@@ -39,6 +42,7 @@ class Request extends \yii\db\ActiveRecord
             [['vacancy_id'], 'integer'],
             [['first_name', 'last_name'], 'string'],
             [['email'], 'email'],
+            [['resumeFile'], 'file', 'skipOnEmpty' => true, 'extensions' => 'docx, pdf'],
         ];
     }
 
@@ -49,12 +53,46 @@ class Request extends \yii\db\ActiveRecord
     {
         return [
             'request_id' => 'Request ID',
-            'first_name' => 'First Name',
-            'last_name' => 'Last Name',
+            'first_name' => 'Ім\'я',
+            'last_name' => 'Прізвище',
             'email' => 'Email',
-            'resume' => 'Resume',
+            'resume' => 'Резюме',
+            'created_at' => "Час створення",
+            'vacancy' => "Вакансія",
+            'username' => "Ким створено"
         ];
     }
+
+    public function loadParams()
+    {
+        $user = User::findOne(Yii::$app->user->getId());
+        $this->first_name = $user->first_name;
+        $this->last_name = $user->last_name;
+        $this->email = $user->email;
+    }
+
+    public function getFolder()
+    {
+        return Yii::getAlias("@frontend") . '/web/resume/';
+    }
+
+    public function uploadResume()
+    {
+        if ($this->resumeFile->saveAs($this->getFolder() . $this->resume)) {
+            return true;
+        }
+        return null;
+    }
+
+    public function getResumeLink()
+    {
+        if (!is_file(Yii::getAlias("@frontend") . '/web/resume/' . $this->resume)) {
+            return '#';
+        }
+        return '/resume/' . $this->resume;
+    }
+
+
 
     /**
      * Gets query for [[CreatedBy]].

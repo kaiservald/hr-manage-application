@@ -3,6 +3,8 @@ namespace console\controllers;
 
 use common\rbac\ManagerRequestRule;
 use common\rbac\ManagerVacationRule;
+use common\rbac\UpdateUserRule;
+use common\rbac\ViewOwnRequestRule;
 use Yii;
 use yii\console\Controller;
 
@@ -103,4 +105,54 @@ class RbacController extends Controller
         $manager = $auth->getRole("manager");
         $auth->addChild($manager, $updateRequestOwnVacation);
     }
+
+    public function actionUpdateUser()
+    {
+        $auth = Yii::$app->authManager;
+        $rule = new UpdateUserRule();
+        $auth->add($rule);
+
+        $updateUser = $auth->createPermission('updateUser');
+        $updateOwnProfile = $auth->createPermission('updateOwnProfile');
+        $updateOwnProfile->ruleName = $rule->name;
+
+        $auth->add($updateUser);
+        $auth->add($updateOwnProfile);
+        $auth->addChild($updateOwnProfile, $updateUser);
+    }
+
+    public function actionAssignUpdateUser()
+    {
+        $auth = Yii::$app->authManager;
+
+        $updateUser = $auth->getPermission('updateUser');
+        $updateOwnProfile = $auth->getPermission('updateOwnProfile');
+        $admin = $auth->getRole("admin");
+        $authUser = $auth->getRole("authUser");
+        $auth->addChild($admin, $updateUser);
+        $auth->addChild($authUser, $updateOwnProfile);
+    }
+
+    public function actionViewRequest()
+    {
+        $auth = Yii::$app->authManager;
+        $rule = new ViewOwnRequestRule();
+        $auth->add($rule);
+
+        $viewRequest = $auth->createPermission('viewRequest');
+        $viewOwnRequest = $auth->createPermission('viewOwnRequest');
+        $viewOwnRequest->ruleName = $rule->name;
+
+        $auth->add($viewRequest);
+        $auth->add($viewOwnRequest);
+        $auth->addChild($viewOwnRequest, $viewRequest);
+
+        $admin = $auth->getRole("admin");
+        $authUser = $auth->getRole("authUser");
+
+        $auth->addChild($admin, $viewRequest);
+        $auth->addChild($authUser, $viewOwnRequest);
+
+    }
+
 }

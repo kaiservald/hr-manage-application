@@ -2,14 +2,17 @@
 
 namespace frontend\controllers;
 
+use frontend\models\FileSystem;
 use frontend\models\Vacancy;
 use Yii;
 use frontend\models\Request;
 use frontend\models\RequestSearch;
+use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * RequestController implements the CRUD actions for Request model.
@@ -54,8 +57,12 @@ class RequestController extends Controller
      */
     public function actionView($id)
     {
+        $model = $this->findModel($id);
+        if (!Yii::$app->user->can('viewRequest', ['request' => $model])) {
+            throw new ForbiddenHttpException("User can't view this request");
+        }
         return $this->render('view', [
-            'model' => $this->findModel($id),
+            'model' => $model,
         ]);
     }
 
@@ -69,9 +76,23 @@ class RequestController extends Controller
         $model = new Request();
         $vacancy = Vacancy::findOne($vacancy_id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->request_id]);
+        if (Yii::$app->request->isPost) {
+
+            if ($model->load(Yii::$app->request->post())) {
+                $model->resumeFile = UploadedFile::getInstance($model, 'resumeFile');
+                $model->resume = Yii::$app->security->generateRandomString() . '.' . $model->resumeFile->extension;
+                if ($model->save()) {
+                    if ($model->uploadResume()) {
+                        return $this->redirect(['view', 'id' => $model->request_id]);
+                    } else {
+                        FileSystem::deleteFile($model->getFolder() . $model->resume);
+                    }
+                }
+            }
+        } else {
+            $model->loadParams();
         }
+
 
         return $this->render('create', [
             'model' => $model,
@@ -102,18 +123,43 @@ class RequestController extends Controller
     }
 
 
-
     public function actionMy()
     {
-        $searchModel = new RequestSearch();
-        $params = Yii::$app->request->queryParams;
-        $params['RequestSearch']['request.created_by'] = Yii::$app->user->getId();
-        $dataProvider = $searchModel->search($params);
+        $query = Request::find()->where(['created_by' => Yii::$app->user->getId()]);
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+            'sort' => [
+                'defaultOrder' => [
+                    'created_at' => SORT_DESC,
+                ]
+            ],
+        ]);
 
         return $this->render('my', [
-            'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    /**
+     * Deletes an existing Request model.
+     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionDelete($id)
+    {
+        if (!Yii::$app->user->can('deleteRequest')) {
+            throw new ForbiddenHttpException("Ви не можете видалити даний запит");
+        }
+        $model = $this->findModel($id);
+        FileSystem::deleteFile($model->getFolder() . $model->resume);
+        $this->findModel($id)->delete();
+
+        return $this->redirect(['vacancy/view', 'id' => $model->vacancy->vacancy_id]);
     }
 
     /**
